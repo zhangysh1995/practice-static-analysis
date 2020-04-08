@@ -7,9 +7,16 @@ else ()
     set(ENV{LLVM_DIR} $ENV{LLVM_HOME}/lib/cmake/llvm)
 endif()
 
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 find_package(LLVM REQUIRED CONFIG)
 add_definitions(${LLVM_DEFINITIONS})
-include_directories(${LLVM_INCLUDE_DIRS})
+
+include_directories($ENV{LLVM_HOME}/include)
 link_directories(${LLVM_LIBRARY_DIRS})
+
 
 add_subdirectory(skeleton)  # Use your pass name here.
