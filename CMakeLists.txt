@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4)
-
+project(llvm)
 # we need LLVM_HOME in order not automatically set LLVM_DIR
 if(NOT DEFINED ENV{LLVM_HOME})
     message(FATAL_ERROR "$LLVM_HOME is not defined")

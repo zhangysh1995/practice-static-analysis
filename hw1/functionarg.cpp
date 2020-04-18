@@ -4,48 +4,67 @@
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
-#include "llvm/Support/Debug.h"
+#include "llvm/Support/FormatVariadic.h"
+#include "llvm/Support/Process.h"
+#include <string>
+
 
 using namespace llvm;
+using std::string;
 
 namespace {
-  struct farg : public ModulePass {
+  struct Farg : public ModulePass {
     static char ID;
-    farg() : ModulePass(ID) {}
+    Farg() : ModulePass(ID) {}
 
+    // floating-points in LLVM has type-id of 3
+      bool runOnModule(Module &M)  override{
+        string s;
 
-    virtual bool runOnModule(Module &M)  {
         for (auto &it: M) {
-//            if (it == NULL) {
-//                dbgs() << "Error: function is null";
-//            }
-//            if (it.isIntrinsic()) continue;
-            errs() << "name: " << it.getName() << "\n";
+            if (it.isIntrinsic()) continue;
+
+            int num = 0;
+            int fnum = 0;
+
+            for (auto &arg: it.args()) {
+                if (arg.getType()->getTypeID() == Type::TypeID::FloatTyID) fnum ++;
+                num ++;
+            }
+
+            s += formatv("{0}\t{1}\t{2}\n", it.getName(), num, fnum);
         }
 
+        // retrieve the path from environment variable
+        auto pathvar = sys::Process::GetEnv("FOLDER");
+        auto prog = sys::Process::GetEnv("PROG");
+
+        if (!pathvar || !prog) {
+            errs() << "\n ====== You need to specify "
+                      "the output file with: export FOLDER=xxx && export PROG=xxx =====\n\n";
+            std::exit(-1);
+        }
+
+        // output the content to file
+        std::error_code EC;
+        auto *filestream = new raw_fd_ostream(pathvar.getValue() +
+                "H1_" + prog.getValue() + "_Yushan_20562614.txt",
+                EC);
+        *filestream << s;
+        filestream->flush();
+        filestream->close();
       return true;
     }
-
-    virtual bool doFinalization(Module &M) {
-        report();
-    }
-
-  private:
-      static void  report() {
-        errs() << "I report the result;";
-    }
-
   };
 }
 
-char farg::ID = 0;
+char Farg::ID = 0;
 
-static RegisterPass<farg> X("farg", "Count args and the number of floating-point args",
+static RegisterPass<Farg> X("farg", "Count args and the number of floating-point args",
                             false /* Only looks at CFG */,
                             false /* Analysis Pass */);
 
 static llvm::RegisterStandardPasses Y(
         llvm::PassManagerBuilder::EP_EarlyAsPossible,
         [](const llvm::PassManagerBuilder &Builder,
-           llvm::legacy::PassManagerBase &PM) { PM.add(new farg()); });
-
+           llvm::legacy::PassManagerBase &PM) { PM.add(new Farg()); });
