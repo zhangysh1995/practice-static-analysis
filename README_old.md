@@ -9,7 +9,7 @@ and code transformation tools. We consider in this tutorial:
 - Building LLVM from source
 - Building a trivial out-of-source LLVM pass.
 
-We will be building LLVM v`7.0.0` which is the latest as of this writing.
+We will be building LLVM v`10.0.0` which is the latest as of this writing.
 We assume that you have a working compiler toolchain (GCC or LLVM) and that CMake is installed (minimum version 3.4).
 
 
@@ -55,23 +55,7 @@ and unpack it in a directory of your choice which will refer to as `[LLVM_SRC]`
     ```
     Note that `$LLVM_HOME` must __not__ contain `~` (tilde) to refer to your home directory as it won't be expanded. Use absolute paths instead.
 
-## Building a trivial LLVM pass ##
 
-To build the skeleton LLVM pass found in `skeleton` folder:
-```bash
-$ cd llvm-pass-tutorial
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-```
-`cmake` needs to find its LLVM configurations in `[LLVM_DIR]`. We automatically
-setup `[LLVM_DIR]` based on `$LLVM_HOME` for you. Now the easiest way to run the skeleton pass is to use Clang:
-```bash
-$ clang-7.0 -Xclang -load -Xclang build/skeleton/libSkeletonPass.* something.c$
-```
-Note that Clang is the compiler front-end of the LLVM project.
-It can be installed separately in binary form.
 
 ### Further resources
 This tutorial is based on the following resources
